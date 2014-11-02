@@ -10,7 +10,6 @@ module RockIt
   , Playlist(..)
   , getPlaylist
   , TrackInfo(..)
-  , parseTrackInfo
   ) where
 
 import "base" Data.List ( isInfixOf )
@@ -50,6 +49,12 @@ data Result = OK
 
 payload :: String
 payload = "-celhailaragazza"
+
+swfURL :: String
+swfURL = "http://www.rockit.it/web/js/playswf/new1027448.swf"
+
+playURL :: String
+playURL = "http://www.rockit.it/web/include/ajax.play.php"
 
 md5 :: ByteString -> Digest MD5
 md5 = hash
@@ -124,9 +129,6 @@ data Playlist = Playlist { ids :: [Int],
                            name :: String }
   deriving (Eq, Show)
 
-toInt :: String -> Int
-toInt = read
-
 getAttribute :: String -> Element -> Maybe String
 getAttribute name_ (Element _ attrs _) = M.lookup name' attrs >>= Just . T.unpack
   where
@@ -143,7 +145,7 @@ getIDs = foldl combo [] . queryT [jq| li.item li.play a |]
 
   mapper x = toElement x >>= getAttribute "rel"
   mapFilter acc Nothing  = acc
-  mapFilter acc (Just s) = acc ++ [toInt s]
+  mapFilter acc (Just s) = acc ++ [read s]
   combo acc = mapFilter acc . mapper
 
 getTitle :: Cursor Node -> String
@@ -166,9 +168,6 @@ data TrackInfo = TrackInfo { url    :: String,
                              author :: String,
                              album  :: String }
   deriving (Eq, Show, Data, Typeable)
-
-parseTrackInfo :: String -> TrackInfo
-parseTrackInfo = decodeJSON
 
 getRequest :: (BufferType ty) => String -> Request ty
 getRequest uri =
@@ -203,7 +202,7 @@ request uri = setReferer $
       getRequest uri
   where
   rockitID = B.unpack $ md5s $ B.pack $ uri ++ payload
-  setReferer = replaceHeader HdrReferer "http://www.rockit.it/web/js/playswf/new1027448.swf"
+  setReferer = replaceHeader HdrReferer swfURL
 
 get :: (HStream ty) => Request ty -> IO (Either String ty)
 get req = do
@@ -226,7 +225,7 @@ simpleGET = get . getRequest
 
 getTrackInfos :: Int -> IO (Either String TrackInfo)
 getTrackInfos id' = do
-    res <- simplePOST "http://www.rockit.it/web/include/ajax.play.php" [("id", show id'), ("0k", "ok")]
+    res <- simplePOST playURL [("id", show id'), ("0k", "ok")]
     case res of
       Left x    -> return $ Left x
-      Right rsp -> return . Right $ parseTrackInfo rsp
+      Right rsp -> return . Right $ decodeJSON rsp
