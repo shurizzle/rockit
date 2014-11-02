@@ -40,7 +40,7 @@ import "HTTP" Network.HTTP.Headers ( findHeader, HeaderName(..), replaceHeader )
 import "HTTP" Network.BufferType
 import "cryptohash" Crypto.Hash ( Digest, MD5(..), hash, digestToHexByteString )
 import "filepath" System.FilePath ( takeExtension )
-import "system-filepath" Filesystem.Path.CurrentOS ( dirname, fromText, encode )
+import "system-filepath" Filesystem.Path.CurrentOS ( directory, fromText, encode )
 import "directory" System.Directory ( createDirectoryIfMissing )
 import RockIt.Template ( Format, render )
 
@@ -60,13 +60,13 @@ md5s = digestToHexByteString . md5
 crPutStr :: String -> IO ()
 crPutStr str = putStr $ '\r' : str
 
-createDirectory :: FilePath -> IO ()
-createDirectory =
-    createDirectoryIfMissing True . B.unpack . encode . dirname . fromText . T.pack
+mkdir_p :: FilePath -> IO ()
+mkdir_p =
+    createDirectoryIfMissing True . B.unpack . encode . directory . fromText . T.pack
 
 download :: String -> FilePath -> IO Result
 download uri path = do
-    createDirectory path
+    mkdir_p path
     fhndl <- openBinaryFile path WriteMode
     http <- simpleHTTP $ request uri
     case http of
