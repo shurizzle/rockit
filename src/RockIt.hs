@@ -3,6 +3,7 @@
 module RockIt
   (
     Result(..)
+  , defaultTemplate
   , simpleGET
   , downloadPlaylist
   , downloadTrack
@@ -38,7 +39,7 @@ import "HTTP" Network.HTTP.Base ( urlEncodeVars, mkRequest, RequestMethod(..) )
 import "HTTP" Network.HTTP.Headers ( findHeader, HeaderName(..), replaceHeader )
 import "HTTP" Network.BufferType
 import "cryptohash" Crypto.Hash ( Digest, MD5(..), hash, digestToHexByteString )
-import "filepath" System.FilePath ( takeExtension )
+import "filepath" System.FilePath ( takeExtension, pathSeparator )
 import "system-filepath" Filesystem.Path.CurrentOS ( directory, fromText, encode )
 import "directory" System.Directory ( createDirectoryIfMissing )
 import RockIt.Template ( Format, render )
@@ -55,6 +56,9 @@ swfURL = "http://www.rockit.it/web/js/playswf/new1027448.swf"
 
 playURL :: String
 playURL = "http://www.rockit.it/web/include/ajax.play.php"
+
+defaultTemplate :: String
+defaultTemplate = "%p" ++ pathSeparator : "%n - %a - %t%e"
 
 md5 :: ByteString -> Digest MD5
 md5 = hash

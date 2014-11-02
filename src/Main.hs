@@ -1,13 +1,10 @@
 {-# LANGUAGE PackageImports #-}
-import "rockit" RockIt ( noBuffering, simpleGET, downloadPlaylist, getPlaylist, Result(..) )
+import "rockit" RockIt ( defaultTemplate, noBuffering, simpleGET, downloadPlaylist, getPlaylist, Result(..) )
 import "rockit" RockIt.Template ( parse )
 import "base" System.Environment ( getArgs, getProgName )
 import "base" System.Exit ( exitFailure )
 import "base" Data.List ( isInfixOf )
 import "base" System.IO ( hPutStrLn, stderr )
-
-defaultTemplate :: String
-defaultTemplate = "%p/%n - %a - %t%e"
 
 main :: IO ()
 main = do
