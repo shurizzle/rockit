@@ -31,9 +31,8 @@ doMagic template url = do
           Nothing       -> do
             die "Invalid URL"
   where
-  die x = do
-    hPutStrLn stderr $ "ERROR: " ++ x
-    exitFailure
+  err' x = hPutStrLn stderr $ "ERROR: " ++ x
+  die x = err' x >> exitFailure
 
 usage :: IO ()
 usage = do
@@ -44,6 +43,4 @@ usage = do
 parseArgs :: [String] -> IO ()
 parseArgs [url]           = doMagic defaultTemplate url
 parseArgs [template, url] = doMagic template url
-parseArgs _               = do
-    usage
-    exitFailure
+parseArgs _               = usage >> exitFailure

@@ -110,14 +110,13 @@ downloadTrack format playlistName playlistSize trackID position = do
     t <- getTrackInfos trackID
     case t of
       Left err -> return $ Error err
-      Right t' -> do
-        putStrLn $ "Downloading [" ++ progress ++ "] " ++ path t'
-        download (url t') (path t')
+      Right t' -> putStrLn (label t') >> download (url t') (path t')
   where
   progress = show position ++ "/" ++ show playlistSize
   ext t  = takeExtension (url t)
   number = formatNumber position playlistSize
   path t = render format playlistName (author t) (title t) (ext t) position number
+  label t = "Downloading [" ++ progress ++ "] " ++ path t
 
 formatNumber :: Int -> Int -> String
 formatNumber curr tot = pad ++ c
