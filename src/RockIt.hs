@@ -49,10 +49,10 @@ data Result = OK
   deriving (Show)
 
 payload :: String
-payload = "-celhailaragazza"
+payload = "-vivarockit"
 
 swfURL :: String
-swfURL = "http://www.rockit.it/web/js/playswf/new1027448.swf"
+swfURL = "http://www.rockit.it/web/js/playswf/new1209506.swf"
 
 playURL :: String
 playURL = "http://www.rockit.it/web/include/ajax.play.php"
